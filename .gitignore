@@ -5,4 +5,4 @@ node_modules/
 *.dll
 
 # tayyor o'rnatuvchi repozitoriyda saqlanadi
-!4-Ornatuvchi-EXE/*.exe
+!dist/*.exe
