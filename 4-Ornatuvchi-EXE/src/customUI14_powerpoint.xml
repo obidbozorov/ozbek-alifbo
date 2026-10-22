@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Excel/PowerPoint lentasi (tools/build_apps.py yasaydi). Tugmalar OzbekAlifbo.bas dagi RB_* makroslarini chaqiradi.
+     image="..." — o'rnatuvchi shablonga qo'shadigan ikonkalar (customUI/images).
+     Nomlar getLabel (RB_Label) orqali: tag="nom|amal", tezkor tugma o'rnatuvchi tanlagan holda qavsda ikkinchi qatorga tushadi.
+     Har bir o'girish tugmasi: matn belgilangan bo'lsa - faqat uni, aks holda butun hujjatni. -->
+<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="RB_OnLoad">
+  <ribbon>
+    <tabs>
+      <tab id="tabYangiAlifbo" label="Özbekça" insertAfterMso="TabHome">
+        <group id="grpOgirish" label="Ögiriş">
+          <button id="btnYangi" getLabel="RB_Label" tag="Yangi alifboga|Lotin" size="large" image="iYangi"
+                  screentip="Yangi alifboga ögiriş"
+                  supertip="Kirill (Ўзбекистон) ham, eski lotin (Oʻzbekiston) ham → Özbekiston. Har abzas öz yozuvi böyiça ögiriladi, rusça abzaslar ötkazib yuboriladi. Matn belgilangan bölsa — faqat uni, aks holda butun hujjatni. Bekor qiliş: Ctrl+Z."
+                  onAction="RB_YangiAlifboga"/>
+          <button id="btnEski" getLabel="RB_Label" tag="Eskichaga|Eski" size="large" image="iEski"
+                  screentip="Amaldagi (eski) lotinga oʻgirish"
+                  supertip="Yangi alifbo (Özbekiston) ham, kirill (Ўзбекистон) ham → Oʻzbekiston. Rus tilidagi abzaslar oʻtkazib yuboriladi. Matn belgilangan boʻlsa — faqat uni, aks holda butun hujjatni."
+                  onAction="RB_Eskichaga"/>
+          <button id="btnKirillga" getLabel="RB_Label" tag="Кириллга|LotinKirill" size="large" image="iLotinKirill"
+                  screentip="Кирилл ёзувига ўгириш"
+                  supertip="Янги (Özbekiston) ва амалдаги (Oʻzbekiston) лотин → Ўзбекистон. Истисно сўзлар (SHA-256, Microsoft) лотинча қолади. Матн белгиланган бўлса — фақат уни, акс ҳолда бутун ҳужжатни."
+                  onAction="RB_Kirillga"/>
+        </group>
+        <group id="grpIstisno" label="Istisno sözlar">
+          <button id="btnIstisnolar" getLabel="RB_Label" tag="Boşqariş|Istisnolar" size="large" image="iIstisnolar"
+                  screentip="Istisno sözlarni boşqariş"
+                  supertip="Köriş, qöşiş, öçiriş, standart istisnolarni yoqiş/öçiriş, sözni tekşiriş."
+                  onAction="RB_Istisnolar"/>
+          <button id="btnIstisnoQosh" getLabel="RB_Label" tag="Sözni qöşiş|Istisno" image="iIstisnoQosh"
+                  screentip="Kursor turgan sözni istisno sözlarga qöşiş"
+                  supertip="Söz allaqaçon ögirilgan bölsa (Şamir), hujjatda asl holiga (Shamir) qaytaradi. Kirill söz bölsa — kirill istisnosiga."
+                  onAction="RB_IstisnoAvto"/>
+          <button id="btnIstisnoRoyxat" label="Röyxatni köriş" image="iRoyxat" onAction="RB_IstisnoRoyxat"/>
+          <button id="btnKirillIstisno" label="Kirill istisno sözlari" image="iKirillIstisno"
+                  screentip="Kirilldan ögirişdagi istisno sözlar"
+                  supertip="Ögirilmaydigan kirill sözlar va maxsus şakllar: Майкрософт → Microsoft (Майкрософтнинг → Microsoftning)."
+                  onAction="RB_KirillIstisnolar"/>
+          <button id="btnKirillIstisnoQosh" label="Kirill sözni qöşiş" image="iKirillIstisnoQosh"
+                  onAction="RB_KirillIstisnoQoshish"/>
+        </group>
+        <group id="grpYordam" label="Yordam">
+          <button id="btnYordam" label="Yordam" size="large" image="iYordam"
+                  screentip="Yordam va tezkor tugmalar röyxati" onAction="RB_Yordam"/>
+        </group>
+      </tab>
+    </tabs>
+  </ribbon>
+</customUI>

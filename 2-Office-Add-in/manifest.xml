@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Yangi o'zbek alifbosi - Word Add-in manifesti.
+  MUHIM: https://obidbozorov.github.io/ozbek-alifbo/ manzilini o'zingiz
+  fayllarni joylagan HTTPS manzilga almashtiring (README ga qarang).
+-->
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+           xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+           xsi:type="TaskPaneApp">
+  <Id>b4d605ca-e830-4715-9b24-a4d5560803e6</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>O.N. Bozorov</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="Özbekça"/>
+  <Description DefaultValue="Matnni yangi o'zbek alifbosiga o'giradi: O' -> Ö, G' -> Ğ, Sh -> Ş, Ch -> Ç"/>
+  <IconUrl DefaultValue="https://obidbozorov.github.io/ozbek-alifbo/assets/icon-32.png"/>
+  <HighResolutionIconUrl DefaultValue="https://obidbozorov.github.io/ozbek-alifbo/assets/icon-64.png"/>
+  <SupportUrl DefaultValue="https://github.com/obidbozorov"/>
+  <AppDomains>
+    <AppDomain>https://obidbozorov.github.io</AppDomain>
+  </AppDomains>
+  <Hosts>
+    <Host Name="Document"/>
+  </Hosts>
+  <Requirements>
+    <Sets DefaultMinVersion="1.3">
+      <Set Name="WordApi" MinVersion="1.3"/>
+    </Sets>
+  </Requirements>
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://obidbozorov.github.io/ozbek-alifbo/taskpane.html"/>
+  </DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Hosts>
+      <Host xsi:type="Document">
+        <DesktopFormFactor>
+          <GetStarted>
+            <Title resid="GetStarted.Title"/>
+            <Description resid="GetStarted.Description"/>
+            <LearnMoreUrl resid="GetStarted.LearnMoreUrl"/>
+          </GetStarted>
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <OfficeTab id="TabHome">
+              <Group id="Alifbo.Group">
+                <Label resid="Group.Label"/>
+                <Icon>
+                  <bt:Image size="16" resid="Icon.16"/>
+                  <bt:Image size="32" resid="Icon.32"/>
+                  <bt:Image size="80" resid="Icon.80"/>
+                </Icon>
+                <Control xsi:type="Button" id="Alifbo.OpenPane">
+                  <Label resid="Button.Label"/>
+                  <Supertip>
+                    <Title resid="Button.Label"/>
+                    <Description resid="Button.Tooltip"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16"/>
+                    <bt:Image size="32" resid="Icon.32"/>
+                    <bt:Image size="80" resid="Icon.80"/>
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>AlifboPane</TaskpaneId>
+                    <SourceLocation resid="Taskpane.Url"/>
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Icon.16" DefaultValue="https://obidbozorov.github.io/ozbek-alifbo/assets/icon-16.png"/>
+        <bt:Image id="Icon.32" DefaultValue="https://obidbozorov.github.io/ozbek-alifbo/assets/icon-32.png"/>
+        <bt:Image id="Icon.80" DefaultValue="https://obidbozorov.github.io/ozbek-alifbo/assets/icon-80.png"/>
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="Taskpane.Url" DefaultValue="https://obidbozorov.github.io/ozbek-alifbo/taskpane.html"/>
+        <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://github.com/obidbozorov"/>
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="GetStarted.Title" DefaultValue="Özbekça tayyor"/>
+        <bt:String id="Group.Label" DefaultValue="Özbekça"/>
+        <bt:String id="Button.Label" DefaultValue="Özbekça"/>
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="GetStarted.Description" DefaultValue="Bosh sahifadagi 'Yangi alifbo' tugmasini bosing."/>
+        <bt:String id="Button.Tooltip" DefaultValue="O' -> Ö, G' -> Ğ, Sh -> Ş, Ch -> Ç o'girish panelini ochadi"/>
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>

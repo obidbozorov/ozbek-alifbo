@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="Ribbon_Load" loadImage="LoadImage">
+  <ribbon>
+    <tabs>
+      <tab id="tabYangiAlifbo" label="Özbekça" insertAfterMso="TabHome">
+        <group id="grpOgirish" label="Lotin yozuvi">
+          <button id="btnHujjat" label="Töliq ögiriş (Alt+A)" size="large" image="iYangi"
+                  screentip="Yangi alifboga ögiriş (Alt+A)"
+                  supertip="Oʻ → Ö, Gʻ → Ğ, Sh → Ş, Ch → Ç. Kolontitul va izohlar ham. Bekor qiliş: Ctrl+Z"
+                  onAction="OnHujjat"/>
+          <button id="btnTanlangan" label="Belgilangan qismni ögiriş (Alt+A)" size="large" image="iTanlangan"
+                  onAction="OnTanlangan"/>
+          <button id="btnEski" label="Toʻliq eskichaga (Alt+E)" size="large" image="iEski"
+                  screentip="Yangi alifbodan amaldagi (eski) lotinga oʻgirish (Alt+E)"
+                  supertip="Ö → Oʻ, Ğ → Gʻ, Ş → Sh, Ç → Ch."
+                  onAction="OnEskiHujjat"/>
+          <button id="btnEskiSel" label="Belgilangan qismni eskichaga (Alt+E)" size="large" image="iEskiSel"
+                  screentip="Faqat belgilangan matnni eski lotinga (Alt+E)"
+                  onAction="OnEskiTanlangan"/>
+          <toggleButton id="tglYozishda" label="Yozişda ögiriş (Alt+Z)" size="large" image="iYozish"
+                        supertip="sh, ch, o', g' yozilişi bilan yangi harfga aylanadi. Qaytariş: tugmani yana bosing yoki Ctrl+Z."
+                        getPressed="GetLivePressed" onAction="OnLive"/>
+        </group>
+        <group id="grpKirill" label="Kirill yozuvi">
+          <button id="btnKirillHujjat" label="Töliq lotinga (Alt+K)" size="large" image="iKirill"
+                  supertip="Шаҳар → Şahar, Ўзбекистон → Özbekiston. Rusça abzaslar ötkazib yuboriladi."
+                  onAction="OnKirillHujjat"/>
+          <button id="btnKirillTanlangan" label="Belgilangan qismni lotinga (Alt+K)" size="large" image="iKirillSel" onAction="OnKirillTanlangan"/>
+          <button id="btnLotinKirillHujjat" screentip="Лотин ёзувини кириллга ўгириш (Alt+C)" label="Тўлиқ кириллга (Alt+C)" size="large" image="iLotinKirill"
+                  supertip="Янги (Özbekiston) ва амалдаги (Oʻzbekiston) лотин → Ўзбекистон. Истисно сўзлар лотинча қолади."
+                  onAction="OnLotinKirillHujjat"/>
+          <button id="btnLotinKirillTanlangan" label="Белгиланган қисмни кириллга (Alt+C)" size="large" image="iLotinKirillSel" onAction="OnLotinKirillTanlangan"/>
+          <button id="btnKirillIstisno" label="Kirill istisno sözlari" image="iKirillIstisno" onAction="OnKirillIstisnolar"/>
+        </group>
+        <group id="grpIstisno" label="Istisno sözlar">
+          <button id="btnIstisnolar" label="Boşqariş (Alt+O)" size="large" image="iIstisnolar"
+                  supertip="Ögirilmaydigan sözlarni köriş, qöşiş, öçiriş, standartlarni yoqiş/öçiriş, import/eksport."
+                  onAction="OnIstisnolar"/>
+          <button id="btnIstisnoQosh" label="Sözni qöşiş (Alt+I)" image="iIstisnoQosh"
+                  supertip="Söz allaqaçon ögirilgan bölsa (Şamir), hujjatda asl holiga (Shamir) qaytaradi."
+                  onAction="OnIstisnoQoshish"/>
+          <menu id="mnuSozlama" label="Sozlamalar" imageMso="ControlsGallery">
+            <checkBox id="chkInglizcha" label="Inglizça abzaslarni ötkaziş" getPressed="GetEnglishPressed" onAction="OnEnglish"/>
+            <checkBox id="chkRuscha" label="Rusça abzaslarni ötkaziş (kirilldan ögirişda)" getPressed="GetRussianPressed" onAction="OnRussian"/>
+            <checkBox id="chkTugmalar" label="Tezkor tugmalar (Alt + A/E/K/C/Z/I/O)" getPressed="GetHotkeysPressed" onAction="OnHotkeys"/>
+            <checkBox id="chkTutuq" label="Tutuq belgisini bir xillaştiriş (maʼno)" getPressed="GetTutuqPressed" onAction="OnTutuq"/>
+          </menu>
+        </group>
+        <group id="grpYordam" label="Yordam">
+          <button id="btnYordam" label="Yordam" size="large" image="iYordam" onAction="OnYordam"/>
+        </group>
+      </tab>
+    </tabs>
+  </ribbon>
+  <contextMenus>
+    <contextMenu idMso="ContextMenuText">
+      <button id="ctxIstisnoText" label="Istisno sözlarga qöşiş" image="iIstisnoQosh"
+              onAction="OnIstisnoQoshish" insertBeforeMso="Cut"/>
+    </contextMenu>
+    <contextMenu idMso="ContextMenuSpell">
+      <button id="ctxIstisnoSpell" label="Istisno sözlarga qöşiş" image="iIstisnoQosh"
+              onAction="OnIstisnoQoshish"/>
+    </contextMenu>
+  </contextMenus>
+</customUI>

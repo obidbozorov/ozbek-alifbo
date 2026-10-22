@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Özbekça</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <script src="converter.js"></script>
+  <script src="taskpane.js"></script>
+  <style>
+    :root {
+      --bg: #ffffff; --fg: #1f2328; --muted: #5d6570; --line: #d9dee3;
+      --accent: #1e6e5a; --accent-fg: #ffffff; --soft: #eef6f3; --warn: #8a5a00;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #1f1f1f; --fg: #e8e8e8; --muted: #a3a9b0; --line: #3a3f44;
+              --accent: #3fae8f; --accent-fg: #0f1a17; --soft: #23302c; --warn: #e0b04a; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 16px; font: 14px/1.45 "Segoe UI", system-ui, sans-serif;
+           background: var(--bg); color: var(--fg); }
+    h1 { font-size: 18px; margin: 0 0 2px; }
+    .sub { color: var(--muted); font-size: 12.5px; margin-bottom: 14px; }
+    .map { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 16px; }
+    .map div { background: var(--soft); border-radius: 6px; padding: 6px 0; text-align: center; font-size: 13px; }
+    .map b { font-size: 16px; }
+    button { width: 100%; padding: 9px 12px; margin-bottom: 8px; border-radius: 6px; font: inherit;
+             border: 1px solid var(--line); background: var(--bg); color: var(--fg); cursor: pointer; }
+    button.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); font-weight: 600; }
+    button:disabled { opacity: .55; cursor: default; }
+    fieldset { border: 1px solid var(--line); border-radius: 8px; margin: 14px 0 0; padding: 8px 12px 12px; }
+    legend { font-weight: 600; padding: 0 4px; }
+    label.row { display: flex; gap: 8px; align-items: flex-start; margin: 6px 0; cursor: pointer; }
+    label.row input { margin-top: 3px; }
+    .hint { color: var(--muted); font-size: 12px; }
+    textarea { width: 100%; min-height: 70px; border: 1px solid var(--line); border-radius: 6px; padding: 6px;
+               font: 13px/1.4 "Segoe UI", system-ui, sans-serif; background: var(--bg); color: var(--fg); resize: vertical; }
+    #status { min-height: 20px; margin: 4px 0 0; font-size: 13px; }
+    #status.err { color: #c62828; } #status.warn { color: var(--warn); }
+    input[type=text], input[type=search] { width: 100%; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px;
+      font: inherit; background: var(--bg); color: var(--fg); margin-bottom: 8px; }
+    .addrow { display: flex; gap: 6px; } .addrow input { flex: 1; } .addrow button { width: auto; }
+    button.small { padding: 6px 10px; font-size: 13px; }
+    .two { display: flex; gap: 6px; margin-top: 6px; } .two button { flex: 1; }
+    .badge { background: var(--soft); border-radius: 10px; padding: 0 7px; font-size: 12px; font-weight: 500; }
+    .sect { font-weight: 600; font-size: 13px; margin: 6px 0 4px; }
+    .elist { list-style: none; margin: 0 0 8px; padding: 0; max-height: 220px; overflow-y: auto;
+             border: 1px solid var(--line); border-radius: 6px; }
+    .elist li { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-top: 1px solid var(--line); font-size: 13px; }
+    .elist li:first-child { border-top: 0; }
+    .elist li .w { flex: 1; font-family: Consolas, "Courier New", monospace; overflow-wrap: anywhere; }
+    .elist li.off .w { text-decoration: line-through; color: var(--muted); }
+    .elist li .tag { font-size: 11px; color: var(--muted); }
+    .elist li button { width: auto; margin: 0; padding: 1px 7px; border: 0; background: transparent; color: var(--muted); font-size: 15px; }
+    .elist li button:hover { color: #c62828; }
+    .elist .empty { color: var(--muted); justify-content: center; }
+    details { margin: 4px 0 8px; } summary { cursor: pointer; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    code { font-family: Consolas, "Courier New", monospace; font-size: 12px; background: var(--soft); padding: 0 3px; border-radius: 3px; }
+    .out.ok { color: var(--accent); } .out.skip { color: var(--warn); }
+    .out { background: var(--soft); border-radius: 6px; padding: 6px 8px; min-height: 28px; white-space: pre-wrap; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <h1>Özbekça</h1>
+  <div class="sub">Matnni yangi oʻzbek lotin alifbosiga oʻgiradi</div>
+
+  <div class="map">
+    <div>oʻ → <b>ö</b></div><div>gʻ → <b>ğ</b></div><div>sh → <b>ş</b></div><div>ch → <b>ç</b></div>
+  </div>
+
+  <button id="btnDoc" class="primary">Butun hujjatni oʻgirish</button>
+  <button id="btnSel">Belgilangan matnni oʻgirish</button>
+  <div class="sect" style="margin-top:6px">Kirill yozuvidan</div>
+  <div class="two" style="margin-top:0">
+    <button id="btnCyrDoc">Hujjat: kirill → lotin</button>
+    <button id="btnCyrSel">Belgilangan</button>
+  </div>
+  <div class="hint" style="margin:-2px 0 6px">Шаҳар → Şahar, Ўзбекистон → Özbekiston</div>
+  <div class="sect" style="margin-top:6px">Kirill yozuviga</div>
+  <div class="two" style="margin-top:0">
+    <button id="btnL2CDoc">Hujjat: lotin → kirill</button>
+    <button id="btnL2CSel">Belgilangan</button>
+  </div>
+  <div class="hint" style="margin:-2px 0 6px">Özbekiston / Oʻzbekiston → Ўзбекистон</div>
+  <div class="sect" style="margin-top:6px">Eski (amaldagi) lotinga</div>
+  <div class="two" style="margin-top:0">
+    <button id="btnN2ODoc">Hujjat: yangi → eski</button>
+    <button id="btnN2OSel">Belgilangan</button>
+  </div>
+  <div class="hint" style="margin:-2px 0 6px">Özbekiston → Oʻzbekiston, Şahar → Shahar</div>
+  <div id="status" role="status"></div>
+
+  <fieldset>
+    <legend>Yozish paytida</legend>
+    <label class="row"><input type="checkbox" id="chkLive">
+      <span>Yozilayotgan abzasni avtomatik oʻgirish <span class="hint">(tajribaviy, Word 2021/365 kerak)</span></span></label>
+  </fieldset>
+
+  <fieldset>
+    <legend>Sozlamalar</legend>
+    <label class="row"><input type="checkbox" id="chkEnglish" checked>
+      <span>Inglizcha abzaslarni oʻtkazib yuborish <span class="hint">(annotatsiya, adabiyotlar roʻyxati)</span></span></label>
+    <label class="row"><input type="checkbox" id="chkRussian" checked>
+      <span>Kirilldan oʻgirishda ruscha abzaslarni oʻtkazib yuborish</span></label>
+    <label class="row"><input type="checkbox" id="chkTutuq">
+      <span>Tutuq belgisini bir xillashtirish: maʼno, Qurʼon <span class="hint">(ʼ U+02BC)</span></span></label>
+  </fieldset>
+
+  <fieldset>
+    <legend>Istisno soʻzlar <span class="badge" id="excCount"></span></legend>
+    <div class="addrow">
+      <input id="excNew" type="text" placeholder="Yangi soʻz, masalan Schnorr" autocomplete="off" spellcheck="false">
+      <button id="excAdd" class="small">Qoʻshish</button>
+    </div>
+    <button id="excFromSel">Belgilangan soʻzni istisnoga qoʻshish</button>
+    <div id="excMsg" class="hint"></div>
+    <input id="excSearch" type="search" placeholder="Roʻyxatdan qidirish…" autocomplete="off">
+
+    <div class="sect">Mening soʻzlarim</div>
+    <ul id="excUser" class="elist"></ul>
+
+    <details>
+      <summary>Standart istisnolar (<span id="defCount"></span>)</summary>
+      <div class="hint">Belgini olib tashlasangiz, bu soʻz ham oʻgiriladigan boʻladi.</div>
+      <ul id="excDef" class="elist"></ul>
+    </details>
+
+    <details>
+      <summary>Import / eksport</summary>
+      <div class="hint">VBA/VSTO dagi <code>istisnolar.txt</code> bilan bir xil format. <code>!soʻz</code> — standart istisnoni oʻchirish.</div>
+      <textarea id="excBulk" spellcheck="false"></textarea>
+      <div class="two">
+        <button id="excBulkCopy" class="small">Nusxa olish</button>
+        <button id="excBulkApply" class="small">Qoʻllash</button>
+      </div>
+    </details>
+
+    <div class="sect">Soʻzni tekshirish</div>
+    <input id="excTest" type="text" placeholder="Soʻz kiriting — nima boʻlishini koʻrsatadi" autocomplete="off" spellcheck="false">
+    <div class="out" id="excTestOut"></div>
+    <div class="hint" style="margin-top:8px">
+      <b>Shablonlar:</b> <code>phish*</code> — shu bilan boshlanadigan har qanday soʻz;
+      <code>SHA#</code> — keyin faqat raqam yoki «-» (SHA-256, lekin SHAHAR emas).
+      Katta harf boʻlsa — registrga sezgir.
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Kirill istisnolari <span class="badge" id="cyrCount"></span></legend>
+    <div class="hint" style="margin-bottom:6px">Kirilldan oʻgirishda: faqat kirill soʻz — oʻgirilmaydi;
+      lotin shakli bilan — shu shaklda yoziladi, qoʻshimchalari odatdagidek oʻgiriladi
+      (<code>Майкрософтнинг → Microsoftning</code>).</div>
+    <input id="cyrKey" type="text" placeholder="Kirill soʻz yoki oʻzak, masalan Майкрософт" autocomplete="off" spellcheck="false">
+    <div class="addrow">
+      <input id="cyrLat" type="text" placeholder="Lotin shakli (boʻsh — oʻgirilmaydi)" autocomplete="off" spellcheck="false">
+      <button id="cyrAdd" class="small">Qoʻshish</button>
+    </div>
+    <button id="cyrFromSel">Belgilangan kirill soʻzini olish</button>
+    <div id="cyrMsg" class="hint"></div>
+    <div class="sect">Mening yozuvlarim</div>
+    <ul id="cyrUser" class="elist"></ul>
+    <details>
+      <summary>Standart yozuvlar (<span id="cyrDefCount"></span>)</summary>
+      <ul id="cyrDef" class="elist"></ul>
+    </details>
+  </fieldset>
+
+  <fieldset>
+    <legend>Sinab koʻrish</legend>
+    <textarea id="txtTry" placeholder="Masalan: Oʻzbekiston shaharlari yoki Ўзбекистон шаҳарлари"></textarea>
+    <div class="hint" style="margin-top:6px">Yangi lotin:</div>
+    <div class="out" id="outTry" style="margin-top:2px"></div>
+    <div class="hint" style="margin-top:6px">Kirill:</div>
+    <div class="out" id="outTryCyr" style="margin-top:2px"></div>
+  </fieldset>
+</body>
+</html>

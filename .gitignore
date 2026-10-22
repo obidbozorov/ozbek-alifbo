@@ -1,0 +1,5 @@
+# yigish natijalari
+*.exe
+__pycache__/
+node_modules/
+*.dll
