@@ -1,5 +1,10 @@
 # Özbekça 1.0 — Word, Excel va PowerPoint uchun plagin (yangi oʻzbek alifbosi)
 
+<p align="center">
+  <a href="https://github.com/obidbozorov/ozbek-alifbo/raw/main/dist/%C3%96zbek%C3%A7a-1.0.exe"><img src="https://img.shields.io/badge/Download-%C3%96zbek%C3%A7a%201.0%20(.exe)-1e6e5a?style=for-the-badge&logo=windows&logoColor=white" alt="Download Özbekça 1.0"></a>
+  <br><sub>Word, Excel va PowerPoint uchun · Windows · bepul (MIT)</sub>
+</p>
+
 Lentada uchta asosiy tugma: **Yangi alifboga** (kirill va eski lotindan; har abzas oʻz yozuvi boʻyicha),
 **Eskichaga**, **Kirillga**. Matn belgilangan boʻlsa — faqat u, aks holda butun hujjat oʻgiriladi.
 
@@ -21,7 +26,7 @@ va teskarisi — lotindan kirillga: `Özbekiston / Oʻzbekiston → Ўзбеки
 
 ## Eng oson yoʻl: `Özbekça-1.0.exe`
 
-Oʻrnatuvchi: **[dist/Özbekça-1.0.exe](dist/Özbekça-1.0.exe)** (fayl sahifasida **Download raw file** tugmasi).
+**[⬇ Download: Özbekça-1.0.exe](https://github.com/obidbozorov/ozbek-alifbo/raw/main/dist/%C3%96zbek%C3%A7a-1.0.exe)** — bosing, fayl darhol yuklanadi.
 
 1. Wordni yoping.
 2. `4-Ornatuvchi-EXE/Özbekça.exe` ni ikki marta bosing → **Oʻrnatish**.
