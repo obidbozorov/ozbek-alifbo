@@ -21,7 +21,7 @@ va teskarisi — lotindan kirillga: `Özbekiston / Oʻzbekiston → Ўзбеки
 
 ## Eng oson yoʻl: `Özbekça-1.0.exe`
 
-Oʻrnatuvchini **[Releases](https://github.com/obidbozorov/ozbek-alifbo/releases)** boʻlimidan yuklab oling.
+Oʻrnatuvchi: **[4-Ornatuvchi-EXE/Özbekça-1.0.exe](4-Ornatuvchi-EXE/Özbekça-1.0.exe)** (fayl sahifasida **Download raw file** tugmasi).
 
 1. Wordni yoping.
 2. `4-Ornatuvchi-EXE/Özbekça.exe` ni ikki marta bosing → **Oʻrnatish**.
