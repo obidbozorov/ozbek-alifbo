@@ -2552,7 +2552,7 @@ End Function
 
 Public Sub YangiAlifbo_Yordam()
     Dim t As String
-    t = UCase$(AppNomi()) & " 1.0 - " & HostName() & " uchun" & vbCrLf & vbCrLf & _
+    t = UCase$(AppNomi()) & " 1.2 - " & HostName() & " uchun" & vbCrLf & vbCrLf & _
         "Yangi alifboga - kirill ham, eski lotin ham yangi alifboga o'tadi." & vbCrLf & _
         "Eskichaga - yangi alifbodagi va kirill matnni amaldagi lotinga o'giradi." & vbCrLf & _
         "Kirillga - har qanday lotin yozuvini kirillga o'giradi." & vbCrLf & _
@@ -2569,7 +2569,7 @@ Public Sub YangiAlifbo_Yordam()
     t = t & HostUndoHint() & vbCrLf & vbCrLf & _
         "Istisno so'zlar: " & ExceptionsPath() & vbCrLf & _
         "Kirill istisno so'zlari: " & CyrExceptionsPath() & vbCrLf & vbCrLf & _
-        AppNomi() & " 1.0  -  muallif: Bozorov Obidjon Norqobilovich" & vbCrLf & _
+        AppNomi() & " 1.2  -  muallif: Bozorov Obidjon Norqobilovich" & vbCrLf & _
         "Axborot xavfsizligi kafedrasi, O'zMU  -  o.bozorov@nuu.uz"
     MsgBox t, vbInformation, AppNomi() & " - yordam"
 End Sub

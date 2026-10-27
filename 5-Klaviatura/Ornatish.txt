@@ -1,0 +1,37 @@
+ÖZBEKÇA (YANGI ALIFBO) KLAVIATURASI
+====================================
+
+Barcha dasturlarda ishlaydi: Word, Excel, Telegram, brauzer, Bloknot.
+Asos — oddiy lotin (QWERTY) klaviaturasi. Yangi harflar o'ng Alt (AltGr) bilan:
+
+    AltGr + O  ->  ö        Shift + AltGr + O  ->  Ö
+    AltGr + G  ->  ğ        Shift + AltGr + G  ->  Ğ
+    AltGr + S  ->  ş        Shift + AltGr + S  ->  Ş
+    AltGr + C  ->  ç        Shift + AltGr + C  ->  Ç
+    AltGr + '  ->  ʼ (tutuq: maʼno)    Shift + AltGr + '  ->  ʻ
+
+    CapsLock yoqiq bo'lsa, AltGr + O ham katta Ö beradi.
+    O'ng Alt o'rniga Ctrl + chap Alt ham ishlaydi.
+
+O'RNATISH (bir marta)
+---------------------
+1. Microsoft Keyboard Layout Creator 1.4 ni yuklab oling va o'rnating (bepul, Microsoft saytidan):
+   https://www.microsoft.com/download/details.aspx?id=102134
+   (Windows .NET Framework 3.5 ni so'rasa — ruxsat bering.)
+2. Keyboard Layout Creator ni oching: File -> Load Source File... -> OzbekYangi.klc
+3. Project -> Build DLL and Setup Package. Dastur "Documents\OzbYangi" papkasini ochadi.
+4. O'sha papkadagi setup.exe ni ishga tushiring (administrator huquqi kerak).
+5. Kompyuterni qayta yoqing (yoki chiqib-qayta kiring).
+6. Parametrlar -> Vaqt va til -> Til va mintaqa -> "O'zbek (lotin)" -> Klaviaturalar.
+   "Özbekça (yangi alifbo)" ro'yxatda bo'ladi; bo'lmasa — "Klaviatura qo'shish" orqali qo'shing.
+7. Tilni almashtirish: Win + Space (yoki Alt + Shift).
+
+Eslatma: Windows 11 dagi "Интеллектуальное управление приложениями" yoqilgan bo'lsa, imzolanmagan
+setup.exe ni bloklashi mumkin.
+
+O'chirish: Parametrlar -> Ilovalar -> "Özbekça (yangi alifbo)" -> O'chirish.
+
+Wordda Özbekça plagini o'rnatilgan bo'lsa, AltGr + O/G/S/C klaviatura qanday bo'lishidan qat'i nazar
+yangi harfni yozadi (Wordning Ctrl+Alt+C = ©, Ctrl+Alt+O = ko'rinish kabi buyruqlari o'rniga).
+
+Muallif: Bozorov Obidjon Norqobilovich, O'zbekiston Milliy universiteti, Axborot xavfsizligi kafedrasi.

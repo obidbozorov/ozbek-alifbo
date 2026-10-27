@@ -24,15 +24,15 @@ using System.Windows.Forms;
 using System.Xml.Linq;
 using Microsoft.Win32;
 
-[assembly: AssemblyTitle("Özbekça 1.0")]
-[assembly: AssemblyDescription("Word, Excel va PowerPoint uçun yangi özbek alifbosi plagini")]
+[assembly: AssemblyTitle("Özbekça 1.2")]
+[assembly: AssemblyDescription("Word, Excel, PowerPoint plagini va klaviatura — yangi özbek alifbosi")]
 [assembly: AssemblyCompany("Mirzo Uluğbek nomidagi Özbekiston Milliy universiteti")]
 [assembly: AssemblyProduct("Özbekça")]
 [assembly: AssemblyCopyright("© 2026 Bozorov Obidjon Norqobilovich")]
 [assembly: AssemblyTrademark("Özbekça")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: AssemblyInformationalVersion("1.0")]
+[assembly: AssemblyVersion("1.2.0.0")]
+[assembly: AssemblyFileVersion("1.2.2.0")]
+[assembly: AssemblyInformationalVersion("1.2")]
 
 namespace YangiAlifbo
 {
@@ -43,7 +43,7 @@ namespace YangiAlifbo
 
     internal static class Installer
     {
-        public const string Version = "1.0";
+        public const string Version = "1.2.2";
         public const string DotmName = "Ozbekca.dotm";
         const string OldDotmName = "YangiAlifbo.dotm";   // 1.3 va undan oldingi versiyalar
         const string RegKey = @"Software\OzbekAlifbo";
@@ -138,23 +138,163 @@ namespace YangiAlifbo
             if (InstalledPath != null) l.Add("Word");
             if (File.Exists(Path.Combine(AddInsDir, XlamName))) l.Add("Excel");
             if (File.Exists(Path.Combine(AddInsDir, PpamName))) l.Add("PowerPoint");
+            if (KeyboardInstalled) l.Add("klaviatura");
             return l;
         }
 
-        /// <summary>Kompyuterdagi Word, Excel va PowerPoint ga o'rnatadi; o'rnatilganlar ro'yxatini qaytaradi.</summary>
-        public static List<string> Install(Action<string> log)
+        // ------------------------------------------------------------ klaviatura «Özbekça (yangi alifbo)»
+        // Keyboard Layout Creator yasagan MSI paketlari (klaviatura/OzbYangi_*.msi) ichkariga joylangan.
+        const string KbdDll = "OzbYangi.dll";
+
+        public static bool KeyboardInstalled
         {
-            var running = RunningApps();
-            if (running.Count > 0)
-                throw new InstallerException(string.Join(", ", running) + " oçiq. Ularni yopib, qayta urinib köring.");
+            get
+            {
+                try
+                {
+                    using (var root = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Keyboard Layouts"))
+                        foreach (var n in root.GetSubKeyNames())
+                            using (var k = root.OpenSubKey(n))
+                                if (string.Equals(k?.GetValue("Layout File") as string, KbdDll, StringComparison.OrdinalIgnoreCase))
+                                    return true;
+                }
+                catch { }
+                return KbdUninstallEntry() != null;
+            }
+        }
+
+        /// <summary>Dasturlar ro'yxatidagi klaviatura yozuvi (Keyboard Layout Creator paketi) — topilmasa null.</summary>
+        static string KbdUninstallEntry()
+        {
+            foreach (var view in new[] { RegistryView.Registry64, RegistryView.Registry32 })
+            {
+                try
+                {
+                    using (var hk = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, view))
+                    using (var root = hk.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"))
+                        foreach (var n in root.GetSubKeyNames())
+                            using (var k = root.OpenSubKey(n))
+                            {
+                                string dn = k?.GetValue("DisplayName") as string ?? "";
+                                if (dn.IndexOf("yangi alifbo", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                    dn.IndexOf("OzbYangi", StringComparison.OrdinalIgnoreCase) >= 0)
+                                    return n;
+                            }
+                }
+                catch { }
+            }
+            return null;
+        }
+
+        static string KbdLogPath => Path.Combine(Path.GetTempPath(), "Ozbekca_klaviatura.log");
+
+        /// <summary>msiexec jurnalidan xato qatorlari (oxirgi bir nechtasi).</summary>
+        static string MsiLogErrors()
+        {
+            try
+            {
+                var lines = File.ReadAllLines(KbdLogPath, Encoding.Unicode);
+                var bad = lines.Where(l => l.IndexOf("Return value 3", StringComparison.OrdinalIgnoreCase) >= 0
+                                        || l.StartsWith("Error ", StringComparison.OrdinalIgnoreCase)
+                                        || l.IndexOf("Ошибка", StringComparison.OrdinalIgnoreCase) >= 0
+                                        || l.IndexOf("Error 1", StringComparison.OrdinalIgnoreCase) >= 0
+                                        || l.IndexOf("Note: 1:", StringComparison.OrdinalIgnoreCase) >= 0)
+                                .Select(l => l.Length > 220 ? l.Substring(0, 220) + "…" : l).ToList();
+                return string.Join("\n", bad.Skip(Math.Max(0, bad.Count - 6)));
+            }
+            catch { return ""; }
+        }
+
+        static bool IsArm64 =>
+            string.Equals(Environment.GetEnvironmentVariable("PROCESSOR_ARCHITEW6432") ?? Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE"),
+                          "ARM64", StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>msiexec ni administrator ruxsati bilan ishga tushiradi; chiqish kodini qaytaradi.</summary>
+        static int RunMsi(string args)
+        {
+            var psi = new ProcessStartInfo("msiexec.exe", args) { UseShellExecute = true, Verb = "runas" };
+            try
+            {
+                using (var p = Process.Start(psi)) { p.WaitForExit(); return p.ExitCode; }
+            }
+            catch (System.ComponentModel.Win32Exception) { return 1602; }   // foydalanuvchi ruxsat bermadi
+        }
+
+        static string ExtractKbdMsi()
+        {
+            string res = Environment.Is64BitOperatingSystem ? "OzbYangi_amd64.msi" : "OzbYangi_i386.msi";
+            string dir = Path.Combine(Path.GetTempPath(), "Ozbekca_kbd_" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(dir);
+            string path = Path.Combine(dir, res);
+            File.WriteAllBytes(path, Resource(res));
+            // paket DLL'larni o'z ichida saqlamaydi — yonidagi papkalardan oladi (amd64\, wow64\, i386\)
+            foreach (var arch in Environment.Is64BitOperatingSystem ? new[] { "amd64", "wow64" } : new[] { "i386" })
+            {
+                Directory.CreateDirectory(Path.Combine(dir, arch));
+                File.WriteAllBytes(Path.Combine(dir, arch, KbdDll), Resource("kbd_" + arch + "_" + KbdDll));
+            }
+            return path;
+        }
+
+        /// <summary>Klaviaturani o'rnatadi. true — qayta yoqish kerak.</summary>
+        public static bool InstallKeyboard(Action<string> log)
+        {
+            log("━━━ Klaviatura ━━━");
+            if (IsArm64) { log("ARM kompyuterlar uçun klaviatura hozirça yöq — ötkazib yuborildi."); return false; }
+            if (KeyboardInstalled) { log("«Özbekça (yangi alifbo)» klaviaturasi allaqaçon örnatilgan."); return false; }
+            log("1/2. Örnatiş paketi tayyorlanmoqda...");
+            string msi = ExtractKbdMsi();
+            log("2/2. Örnatilmoqda — Windows administrator ruxsatini söraydi...");
+            int code = RunMsi("/i \"" + msi + "\" /passive /norestart /l*v \"" + KbdLogPath + "\"");
+            try { Directory.Delete(Path.GetDirectoryName(msi), true); } catch { }
+            if (code == 0 || code == 3010)
+            {
+                log("        Klaviatura: tayyor. Kompyuter qayta yoqilgandan keyin tillar röyxatida paydo böladi.");
+                return true;
+            }
+            if (code == 1602 || code == 1223) throw new InstallerException("Klaviatura örnatilmadi: administrator ruxsati berilmadi.");
+            if (code == 1638) { log("        Klaviatura allaqaçon örnatilgan."); return false; }
+            string det = MsiLogErrors();
+            throw new InstallerException("Klaviatura örnatilmadi (msiexec kodi " + code + ").\n" +
+                (det.Length > 0 ? det + "\n" : "") + "Töliq jurnal: " + KbdLogPath);
+        }
+
+        public static void UninstallKeyboard(Action<string> log)
+        {
+            if (!KeyboardInstalled) return;
+            string msi = ExtractKbdMsi();
+            log("Klaviatura olib taşlanmoqda — Windows administrator ruxsatini söraydi...");
+            int code = RunMsi("/x \"" + msi + "\" /passive /norestart");
+            try { Directory.Delete(Path.GetDirectoryName(msi), true); } catch { }
+            if (code == 0 || code == 3010) log("Klaviatura: olib taşlandi (kompyuter qayta yoqilgaç butunlay yöqoladi).");
+            else log("Klaviatura olib taşlanmadi (kod " + code + ").");
+        }
+
+        /// <summary>Kompyuterdagi Word, Excel va PowerPoint ga o'rnatadi; o'rnatilganlar ro'yxatini qaytaradi.</summary>
+        public static List<string> Install(Action<string> log) => Install(log, false);
+
+        public static List<string> Install(Action<string> log, bool withKeyboard)
+        {
             var done = new List<string>();
             var errors = new List<string>();
             var apps = AvailableApps();
-            if (apps.Count == 0) throw new InstallerException("Microsoft Word, Excel yoki PowerPoint topilmadi. Avval Microsoft Office ni örnating.");
+            if (apps.Count == 0 && !withKeyboard)
+                throw new InstallerException("Microsoft Word, Excel yoki PowerPoint topilmadi. Avval Microsoft Office ni örnating.");
+            var running = RunningApps();
+            if (running.Count > 0 && apps.Count > 0)
+                throw new InstallerException(string.Join(", ", running) + " oçiq. Ularni yopib, qayta urinib köring.");
+
+            if (withKeyboard)
+            {
+                try { if (InstallKeyboard(log)) done.Add("klaviatura"); }
+                catch (InstallerException ex) { errors.Add("klaviatura"); log("XATO (klaviatura): " + ex.Message); }
+                catch (Exception ex) { errors.Add("klaviatura"); log("XATO (klaviatura): " + ex.Message); }
+                log("");
+            }
 
             foreach (var app in new[] { "Word", "Excel", "PowerPoint" })
             {
-                if (!apps.Contains(app)) { log(app + " topilmadi — ötkazib yuborildi."); log(""); continue; }
+                if (!apps.Contains(app)) { if (apps.Count > 0) { log(app + " topilmadi — ötkazib yuborildi."); log(""); } continue; }
                 log("━━━ " + app + " ━━━");
                 try
                 {
@@ -166,9 +306,11 @@ namespace YangiAlifbo
                 catch (Exception ex) { errors.Add(app); log("XATO (" + app + "): " + ex.Message); }
                 log("");
             }
-            if (done.Count == 0) throw new InstallerException("Hech bir dasturga örnatib bölmadi. Yuqoridagi xabarlarni köring.");
+            if (done.Count == 0 && errors.Count > 0) throw new InstallerException("Hech narsa örnatilmadi. Yuqoridagi xabarlarni köring.");
             using (var k = Registry.CurrentUser.CreateSubKey(RegKey)) k.SetValue("Version", Version);
-            log("Tayyor! " + string.Join(", ", done) + " ni oçing — yuqorida «Özbekça» lentasi paydo böladi.");
+            var offs = done.Where(d => d != "klaviatura").ToList();
+            if (offs.Count > 0) log("Tayyor! " + string.Join(", ", offs) + " ni oçing — yuqorida «Özbekça» lentasi paydo böladi.");
+            if (done.Contains("klaviatura")) log("Klaviatura uçun kompyuterni qayta yoqing; keyin tilni Win + Space bilan almaştiring.");
             if (errors.Count > 0) log("Örnatilmadi: " + string.Join(", ", errors) + " (sababi yuqorida).");
             return done;
         }
@@ -194,7 +336,7 @@ namespace YangiAlifbo
             try
             {
                 log("2/5. Plagin tayyorlanmoqda, biroz kuting...");
-                app = Activator.CreateInstance(Type.GetTypeFromProgID("Word.Application"));
+                app = StartOffice("Word.Application", "Word", log);
                 Set(app, "Visible", false);
                 Set(app, "DisplayAlerts", 0);
                 startup = Get(app, "StartupPath") as string;
@@ -300,7 +442,7 @@ namespace YangiAlifbo
             try
             {
                 log("2/3. Ögiriş funksiyalari qöşilmoqda...");
-                o = Activator.CreateInstance(Type.GetTypeFromProgID(progId));
+                o = StartOffice(progId, app, log);
                 if (xl)
                 {
                     Set(o, "Visible", false);
@@ -482,8 +624,7 @@ namespace YangiAlifbo
                 {
                     WdKeyAlt + hk[2][0], WdKeyAlt + hk[3][0],
                     WdKeyAlt + WdKeyShift + hk[2][0], WdKeyAlt + WdKeyShift + hk[3][0],
-                    WdKeyControl + WdKeyAlt + WdKeyShift + hk[2][0],
-                };
+                };                                        // Ctrl+Alt (= AltGr) harflar uchun band
                 int code = -1; string firstBusy = null;
                 foreach (var c in cands)
                 {
@@ -552,6 +693,24 @@ namespace YangiAlifbo
                     catch { }
                 }
             }
+
+            // AltGr (Ctrl+Alt) + O/G/S/C -> ö ğ ş ç (Shift bilan katta), AltGr + ' -> ʼ, Shift+AltGr+' -> ʻ.
+            // Word'ning shu tugmalardagi o'z buyruqlari (Ctrl+Alt+C = ©, Ctrl+Alt+O = ko'rinish ...) o'rniga.
+            int ca = WdKeyControl + WdKeyAlt;
+            var harflar = new[] {
+                new object[] { ca + 'O', "Harf_o" }, new object[] { ca + WdKeyShift + 'O', "Harf_OKatta" },
+                new object[] { ca + 'G', "Harf_g" }, new object[] { ca + WdKeyShift + 'G', "Harf_GKatta" },
+                new object[] { ca + 'S', "Harf_s" }, new object[] { ca + WdKeyShift + 'S', "Harf_SKatta" },
+                new object[] { ca + 'C', "Harf_c" }, new object[] { ca + WdKeyShift + 'C', "Harf_CKatta" },
+                new object[] { ca + 222, "Harf_Tutuq" }, new object[] { ca + WdKeyShift + 222, "Harf_Ayn" } };
+            int hb = 0;
+            foreach (var hk in harflar)
+                foreach (var name in new[] { "OzbekAlifbo." + hk[1], (string)hk[1] })
+                {
+                    try { Call(kbs, "Add", WdKeyCategoryMacro, name, (int)hk[0]); hb++; break; }
+                    catch { }
+                }
+            log("        AltGr + O / G / S / C → ö ğ ş ç" + (hb == harflar.Length ? " — tayyor." : " (" + hb + " / " + harflar.Length + ")"));
             return ok;
         }
 
@@ -571,7 +730,7 @@ namespace YangiAlifbo
             object app = null;
             try
             {
-                app = Activator.CreateInstance(Type.GetTypeFromProgID("Word.Application"));
+                app = StartOffice("Word.Application", "Word", null);
                 Set(app, "Visible", false);
                 Set(app, "DisplayAlerts", 0);
                 object normal = Get(app, "NormalTemplate");
@@ -605,7 +764,7 @@ namespace YangiAlifbo
             var installed = InstalledApps();
             if (installed.Count == 0) { log("Plagin örnatilmagan."); return false; }
             var running = RunningApps();
-            if (running.Count > 0)
+            if (running.Count > 0 && installed.Any(a => a != "klaviatura"))
                 throw new InstallerException(string.Join(", ", running) + " oçiq. Ularni yopib, qayta urinib köring.");
             var path = InstalledPath;
             if (path != null)
@@ -645,6 +804,7 @@ namespace YangiAlifbo
                 k?.DeleteValue("InstallPath", false);
                 k?.DeleteValue("Version", false);
             }
+            UninstallKeyboard(log);
             log("Istisno sözlaringiz saqlanib qoldi: %APPDATA%\\OzbekAlifbo\\istisnolar.txt");
             return true;
         }
@@ -755,6 +915,37 @@ namespace YangiAlifbo
             File.Move(tmp, dotmPath);
         }
 
+        /// <summary>Office dasturini fon rejimida ishga tushiradi. Darhol javob bermasa (masalan, birinchi ishga
+        /// tushirish yoki faollashtirish oynasi ochilib turgan bo'lsa) bir necha marta kutib qayta uriniladi;
+        /// baribir bo'lmasa — tushunarli o'zbekcha sabab bilan to'xtaydi.</summary>
+        static object StartOffice(string progId, string app, Action<string> log)
+        {
+            Exception last = null;
+            for (int attempt = 1; attempt <= 3; attempt++)
+            {
+                try { return Activator.CreateInstance(Type.GetTypeFromProgID(progId)); }
+                catch (Exception ex)
+                {
+                    last = ex is TargetInvocationException && ex.InnerException != null ? ex.InnerException : ex;
+                    if (attempt < 3)
+                    {
+                        log?.Invoke("        " + app + " javob bermadi, qayta urinilmoqda (" + attempt + "/2)...");
+                        Thread.Sleep(4000);
+                    }
+                }
+            }
+            int hr = last is COMException ce ? ce.ErrorCode : (last != null ? Marshal.GetHRForException(last) : 0);
+            string why =
+                app + " ni ishga tuşirib bölmadi" + (hr != 0 ? " (kod 0x" + hr.ToString("X8") + ")" : "") + ".\n\n" +
+                "Quyidagilarni tekşiring:\n" +
+                "1. " + app + " ni bir marta qölda oçing. Faollaştiriş, birinçi işga tuşiriş yoki tiklaş oynasi çiqsa — oxirigaça bajarib, yoping.\n" +
+                "2. Диспетчер задач (Ctrl+Shift+Esc) da yaşirin " + app + " jarayoni qolgan bölsa — uni yoping.\n" +
+                "3. Örnatuvçini «administrator nomidan» emas, oddiy işga tuşiring.\n" +
+                "4. Bölmasa: Панель управления → Программы → Microsoft Office → Изменить → Восстановить.\n" +
+                "Eslatma: Office Starter versiyasi makroslarni qöllamaydi — unga örnatib bölmaydi.";
+            throw new InstallerException(why);
+        }
+
         // ------------------------------------------------------------ yordamchilar
         static void SaveXml(XDocument doc, Stream s)          // BOM siz UTF-8 (Office fayllaridagi kabi)
         {
@@ -807,10 +998,11 @@ namespace YangiAlifbo
         readonly Button _btnRemove = new Button();
         readonly Button _btnClose = new Button();
         readonly ProgressBar _bar = new ProgressBar();
+        readonly CheckBox _chkKbd = new CheckBox();
 
         public SetupForm()
         {
-            Text = "Özbekça 1.0 — örnatiş";
+            Text = "Özbekça 1.2 — örnatiş";
             SuspendLayout();
             // Masshtabga bog'liq emas: oyna har doim 100% dagidek chiziladi, kattalashtirishni
             // Windowsning o'zi butun oynaga bir xil qo'llaydi — joylashuv hech qachon buzilmaydi
@@ -832,7 +1024,7 @@ namespace YangiAlifbo
             };
             header.Controls.Add(new Label
             {
-                Text = "Özbekça 1.0", ForeColor = Color.White, Font = new Font("Times New Roman", 22f, FontStyle.Bold),
+                Text = "Özbekça 1.2", ForeColor = Color.White, Font = new Font("Times New Roman", 22f, FontStyle.Bold),
                 AutoSize = true, Margin = new Padding(0, 0, 0, 10)
             });
             header.Controls.Add(new Label
@@ -845,6 +1037,7 @@ namespace YangiAlifbo
             var body = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, Padding = new Padding(16, 10, 16, 12) };
             body.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
             body.RowStyles.Add(new RowStyle(SizeType.AutoSize));          // tavsif
+            body.RowStyles.Add(new RowStyle(SizeType.AutoSize));          // klaviatura
             body.RowStyles.Add(new RowStyle(SizeType.AutoSize));          // holat
             body.RowStyles.Add(new RowStyle(SizeType.Percent, 100));      // natijalar oynasi
             body.RowStyles.Add(new RowStyle(SizeType.AutoSize));          // jarayon chizig'i
@@ -852,7 +1045,7 @@ namespace YangiAlifbo
 
             var info = new Label
             {
-                Text = "Word, Excel va PowerPoint uçun plagin. Örnatilgaç, ularda «Özbekça» lentasi paydo böladi: " +
+                Text = "Word, Excel va PowerPoint uçun plagin va klaviatura. Örnatilgaç, ularda «Özbekça» lentasi paydo böladi: " +
                        "yangi ↔ eski lotin, kirill ↔ lotin, istisno sözlar (Wordda yoziş paytida ögiriş ham). " +
                        "Örnatişdan oldin bu dasturlarni yoping.",
                 AutoSize = true, Margin = new Padding(0, 0, 0, 6)
@@ -867,17 +1060,26 @@ namespace YangiAlifbo
 
             _state.AutoSize = true; _state.Margin = new Padding(0, 0, 0, 4);
             _state.Font = new Font(Font, FontStyle.Bold);
-            body.Controls.Add(_state, 0, 1);
+            _chkKbd.Text = "Klaviaturani ham örnatiş:  AltGr + O / G / S / C  →  ö ğ ş ç";
+            _chkKbd.AutoSize = true; _chkKbd.Margin = new Padding(0, 0, 0, 8);
+            _chkKbd.Checked = !Installer.KeyboardInstalled;
+            body.Controls.Add(_chkKbd, 0, 1);
+            body.Layout += (s2, e2) =>
+            {
+                int w = body.ClientSize.Width - body.Padding.Horizontal - 4;
+                if (w > 50 && _chkKbd.MaximumSize.Width != w) _chkKbd.MaximumSize = new Size(w, 0);
+            };
+            body.Controls.Add(_state, 0, 2);
 
             _log.Multiline = true; _log.ReadOnly = true; _log.ScrollBars = ScrollBars.Vertical;
             _log.Dock = DockStyle.Fill; _log.Margin = new Padding(0);
             _log.BackColor = Color.FromArgb(246, 248, 248); _log.BorderStyle = BorderStyle.FixedSingle;
             _log.Font = new Font("Times New Roman", 11f);
-            body.Controls.Add(_log, 0, 2);
+            body.Controls.Add(_log, 0, 3);
 
             _bar.Dock = DockStyle.Fill; _bar.Height = 6; _bar.Margin = new Padding(0, 4, 0, 0);
             _bar.Style = ProgressBarStyle.Marquee; _bar.Visible = false;
-            body.Controls.Add(_bar, 0, 3);
+            body.Controls.Add(_bar, 0, 4);
 
             var buttons = new TableLayoutPanel { Dock = DockStyle.Fill, AutoSize = true, ColumnCount = 4, Margin = new Padding(0, 12, 0, 0) };
             buttons.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
@@ -895,7 +1097,7 @@ namespace YangiAlifbo
             buttons.Controls.Add(_btnInstall, 0, 0);
             buttons.Controls.Add(_btnRemove, 1, 0);
             buttons.Controls.Add(_btnClose, 3, 0);
-            body.Controls.Add(buttons, 0, 4);
+            body.Controls.Add(buttons, 0, 5);
 
             var author = new Label
             {
@@ -944,15 +1146,17 @@ namespace YangiAlifbo
         void Run(bool install)
         {
             List<string> running;
-            while ((running = Installer.RunningApps()).Count > 0)
+            bool officeWork = install ? Installer.AvailableApps().Count > 0 : Installer.InstalledApps().Any(a => a != "klaviatura");
+            while (officeWork && (running = Installer.RunningApps()).Count > 0)
             {
                 var r = MessageBox.Show(this, string.Join(", ", running) + " oçiq. Işingizni saqlab, ularning barça oynalarini yoping va «Qayta uriniş» ni bosing.",
                     Text, MessageBoxButtons.RetryCancel, MessageBoxIcon.Warning);
                 if (r != DialogResult.Retry) return;
             }
-            if (!install && MessageBox.Show(this, "Plagin Word, Excel va PowerPoint dan olib taşlansinmi?", Text,
+            if (!install && MessageBox.Show(this, "Plagin Word, Excel va PowerPoint dan" + (Installer.KeyboardInstalled ? ", klaviatura esa Windows'dan" : "") + " olib taşlansinmi?", Text,
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
 
+            bool withKbd = _chkKbd.Checked;
             SetBusy(true);
             _log.Clear();
             // Word bilan ishlash STA oqimida bo'lishi kerak
@@ -962,7 +1166,7 @@ namespace YangiAlifbo
                 List<string> done = null;
                 try
                 {
-                    if (install) done = Installer.Install(Log);
+                    if (install) done = Installer.Install(Log, withKbd);
                     else Installer.Uninstall(Log);
                 }
                 catch (InstallerException ex) { error = ex.Message; }
@@ -978,8 +1182,14 @@ namespace YangiAlifbo
                     }
                     else if (install)
                     {
-                        string msg = "Plagin örnatildi: " + string.Join(", ", done) + ".\n\n" +
-                                     "Dasturni oçing — yuqorida «Özbekça» lentasi paydo böladi.\n";
+                        var offs = done.Where(d => d != "klaviatura").ToList();
+                        string msg = offs.Count > 0
+                            ? "Plagin örnatildi: " + string.Join(", ", offs) + ".\n\nDasturni oçing — yuqorida «Özbekça» lentasi paydo böladi.\n"
+                            : "";
+                        if (done.Contains("klaviatura"))
+                            msg += "\nKlaviatura örnatildi. Kompyuterni qayta yoqing — keyin Win + Space bilan «Özbekça (yangi alifbo)» ni tanlang.\n" +
+                                   "AltGr + O / G / S / C → ö ğ ş ç (Shift bilan katta), AltGr + ' → ʼ.\n";
+                        if (msg.Length == 0) msg = "Hammasi allaqaçon örnatilgan.";
                         if (done.Contains("Word"))
                             msg += "\nWord tezkor tugmalari: " + K("Lotin") + " (yangi alifboga), " + K("Eski") + " (eskichaga), " +
                                    K("LotinKirill") + " (kirillga),\n" +
@@ -1005,6 +1215,7 @@ namespace YangiAlifbo
             _btnInstall.Enabled = !on;
             _btnRemove.Enabled = !on && Installer.InstalledApps().Count > 0;
             _btnClose.Enabled = !on;
+            _chkKbd.Enabled = !on;
             UseWaitCursor = on;
         }
     }

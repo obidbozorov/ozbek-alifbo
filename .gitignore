@@ -6,3 +6,4 @@ node_modules/
 
 # tayyor o'rnatuvchi repozitoriyda saqlanadi
 !dist/*.exe
+!4-Ornatuvchi-EXE/src/klaviatura/*/*.dll

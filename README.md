@@ -1,11 +1,12 @@
-# Özbekça 1.0 — Word, Excel va PowerPoint uchun plagin (yangi oʻzbek alifbosi)
+# Özbekça 1.2 — Word, Excel, PowerPoint plagini va klaviatura (yangi oʻzbek alifbosi)
 
 <p align="center">
-  <a href="https://github.com/obidbozorov/ozbek-alifbo/raw/main/dist/%C3%96zbek%C3%A7a-1.0.exe"><img src="https://img.shields.io/badge/Download-%C3%96zbek%C3%A7a%201.0%20(.exe)-1e6e5a?style=for-the-badge&logo=windows&logoColor=white" alt="Download Özbekça 1.0"></a>
-  <br><sub>Word, Excel va PowerPoint uchun · Windows · bepul (MIT)</sub>
+  <a href="https://github.com/obidbozorov/ozbek-alifbo/raw/main/dist/%C3%96zbek%C3%A7a-1.2.exe"><img src="https://img.shields.io/badge/Download-%C3%96zbek%C3%A7a%201.2%20(.exe)-1e6e5a?style=for-the-badge&logo=windows&logoColor=white" alt="Download Özbekça 1.2"></a>
+  <br><sub>Word, Excel va PowerPoint plagini + klaviatura · Windows · bepul (MIT)</sub>
 </p>
 
-Lentada uchta asosiy tugma: **Yangi alifboga** (kirill va eski lotindan; har abzas oʻz yozuvi boʻyicha),
+Bitta oʻrnatuvchi: Office plagini va **«Özbekça (yangi alifbo)» klaviaturasi** (AltGr + O / G / S / C → ö ğ ş ç — barcha
+dasturlarda). Lentada uchta asosiy tugma: **Yangi alifboga** (kirill va eski lotindan; har abzas oʻz yozuvi boʻyicha),
 **Eskichaga**, **Kirillga**. Matn belgilangan boʻlsa — faqat u, aks holda butun hujjat oʻgiriladi.
 
 **Muallif:** Bozorov Obidjon Norqobilovich — Mirzo Ulugʻbek nomidagi Oʻzbekiston Milliy universiteti,
@@ -24,9 +25,10 @@ Matnni yangi oʻzbek lotin alifbosiga oʻgiradi:
 Kirill yozuvidagi matnni ham toʻgʻridan-toʻgʻri yangi lotinga oʻgiradi: `Ўзбекистон шаҳарлари → Özbekiston şaharlari`,
 va teskarisi — lotindan kirillga: `Özbekiston / Oʻzbekiston → Ўзбекистон`.
 
-## Eng oson yoʻl: `Özbekça-1.0.exe`
+## Eng oson yoʻl: `Özbekça-1.2.exe`
 
-**[⬇ Download: Özbekça-1.0.exe](https://github.com/obidbozorov/ozbek-alifbo/raw/main/dist/%C3%96zbek%C3%A7a-1.0.exe)** — bosing, fayl darhol yuklanadi.
+**[⬇ Download: Özbekça-1.2.exe](https://github.com/obidbozorov/ozbek-alifbo/raw/main/dist/%C3%96zbek%C3%A7a-1.2.exe)** — bosing, fayl darhol yuklanadi. Oʻrnatish oynasida
+«Klaviaturani ham oʻrnatish» belgisi boʻladi (administrator ruxsati soʻraladi; klaviatura kompyuter qayta yoqilgach chiqadi).
 
 1. Wordni yoping.
 2. `4-Ornatuvchi-EXE/Özbekça.exe` ni ikki marta bosing → **Oʻrnatish**.
@@ -206,6 +208,15 @@ qoʻshing. EXE ni qayta yigʻish: `4-Ornatuvchi-EXE/src/build.sh` (Windowsda —
 
 ---
 
+## Klaviatura: «Özbekça (yangi alifbo)»
+
+Barcha dasturlarda ishlaydigan klaviatura joylashuvi (`5-Klaviatura/OzbekYangi.klc`, Microsoft Keyboard Layout Creator
+uchun). Asos — oddiy QWERTY; **AltGr (oʻng Alt) + O / G / S / C → ö ğ ş ç** (Shift bilan katta), **AltGr + ' → ʼ**.
+Oʻrnatish: `5-Klaviatura/Ornatish.txt`. Fayl `tools/make_klc.py` bilan yasaladi.
+
+Wordda plagin oʻrnatilgan boʻlsa, AltGr + O/G/S/C har qanday klaviaturada yangi harfni yozadi (Wordning Ctrl+Alt+C = ©,
+Ctrl+Alt+O kabi buyruqlari oʻrniga); plaginning oʻz tezkor tugmalari Ctrl+Alt ni ishlatmaydi.
+
 ## Qoʻshimcha qoidalar
 
 - **Apostrofning oʻxshash belgilari:** `' ‘ ’ ʻ ʼ ` ´ ′` dan tashqari `ʹ ʽ ʾ ʿ ˈ ˊ ՙ ՚ ׳ ´ ῾ ‛ ꞌ` ham — PDF, OCR va
@@ -368,6 +379,8 @@ python3 tools/check_vba.py       # VBA modulini Wordsiz tekshiradi
 - Imlo qoidalari: [imlo.uz](https://imlo.uz/collections/ozbek-tilining-asosiy-imlo-qoidalari).
 - Apostrofning oʻxshash belgilari va lotin soʻz ichidagi kirill harflarini tuzatish qoidasi — muallifning
   TextLib / WordFileToLatin loyihasidan.
+- Klaviatura paketi (`4-Ornatuvchi-EXE/src/klaviatura/`) — `5-Klaviatura/OzbekYangi.klc` dan
+  Microsoft Keyboard Layout Creator 1.4 bilan yasalgan.
 
 ## Testlar
 

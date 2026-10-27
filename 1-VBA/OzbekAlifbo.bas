@@ -2419,7 +2419,7 @@ Private Function HasCyr(ByVal s As String) As Boolean
 End Function
 
 Public Sub YangiAlifbo_Yordam()
-    MsgBox UCase$(AppNomi()) & " 1.0" & vbCrLf & vbCrLf & _
+    MsgBox UCase$(AppNomi()) & " 1.2" & vbCrLf & vbCrLf & _
         "Yangi alifboga - kirill (Uzbekiston) ham, eski lotin (O'zbekiston) ham yangi alifboga;" & vbCrLf & _
         "   har abzas o'z yozuvi bo'yicha. Ruscha abzaslar o'tkazib yuboriladi." & vbCrLf & _
         "Eskichaga - yangi alifbodagi va kirill matnni amaldagi lotinga o'giradi." & vbCrLf & _
@@ -2436,10 +2436,12 @@ Public Sub YangiAlifbo_Yordam()
         KeyLine("Yozishda", "yozishda o'girishni yoqish/o'chirish") & _
         KeyLine("Istisno", "kursor turgan so'zni istisnoga qo'shish") & _
         KeyLine("Istisnolar", "istisno so'zlarni boshqarish") & _
-        "   O'zgartirish: lentadagi 'Tezkor tugmalar' tugmasi." & vbCrLf & vbCrLf & _
+        "   O'zgartirish: lentadagi 'Tezkor tugmalar' tugmasi." & vbCrLf & _
+        "   AltGr (o'ng Alt) + O / G / S / C - " & ChrW(&HF6) & " " & ChrW(&H11F) & " " & ChrW(&H15F) & " " & ChrW(&HE7) & _
+        " (Shift bilan katta), AltGr + ' - tutuq." & vbCrLf & vbCrLf & _
         "Istisno so'zlar: " & ExceptionsPath() & vbCrLf & _
         "Kirill istisno so'zlari: " & CyrExceptionsPath() & vbCrLf & vbCrLf & _
-        AppNomi() & " 1.0  -  muallif: Bozorov Obidjon Norqobilovich" & vbCrLf & _
+        AppNomi() & " 1.2  -  muallif: Bozorov Obidjon Norqobilovich" & vbCrLf & _
         "Axborot xavfsizligi kafedrasi, O'zMU  -  o.bozorov@nuu.uz", vbInformation, AppNomi() & " - yordam"
 End Sub
 
@@ -2811,6 +2813,57 @@ Private Sub ResetCustomKeys()
         End If
     Next i
     NormalTemplate.Save
+End Sub
+
+'==========================================================================
+'  AltGr (o'ng Alt = Ctrl+Alt) + O/G/S/C -> yangi harflar.
+'  "Ozbekca (yangi alifbo)" klaviaturasi bilan bir xil; Wordda bu tugmalardagi Word buyruqlari
+'  (Ctrl+Alt+C = (c), Ctrl+Alt+O = tuzilma ko'rinishi ...) o'rniga harf yoziladi.
+'  Tugmalarni o'rnatuvchi plagin shablonining o'ziga bog'laydi.
+'==========================================================================
+Private Sub HarfYoz(ByVal ch As String)
+    On Error Resume Next
+    Selection.TypeText ch
+End Sub
+
+Public Sub Harf_o()
+    HarfYoz ChrW(&HF6)
+End Sub
+
+Public Sub Harf_OKatta()
+    HarfYoz ChrW(&HD6)
+End Sub
+
+Public Sub Harf_g()
+    HarfYoz ChrW(&H11F)
+End Sub
+
+Public Sub Harf_GKatta()
+    HarfYoz ChrW(&H11E)
+End Sub
+
+Public Sub Harf_s()
+    HarfYoz ChrW(&H15F)
+End Sub
+
+Public Sub Harf_SKatta()
+    HarfYoz ChrW(&H15E)
+End Sub
+
+Public Sub Harf_c()
+    HarfYoz ChrW(&HE7)
+End Sub
+
+Public Sub Harf_CKatta()
+    HarfYoz ChrW(&HC7)
+End Sub
+
+Public Sub Harf_Tutuq()
+    HarfYoz ChrW(&H2BC)
+End Sub
+
+Public Sub Harf_Ayn()
+    HarfYoz ChrW(&H2BB)
 End Sub
 
 Public Sub RB_Tugmalar(control As IRibbonControl)
