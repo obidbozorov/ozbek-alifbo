@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xkbConfigRegistry SYSTEM "xkb.dtd">
+<xkbConfigRegistry version="1.1">
+  <layoutList>
+    <layout>
+      <configItem>
+        <name>uz-yangi</name>
+        <shortDescription>öz</shortDescription>
+        <description>Özbekça (yangi alifbo)</description>
+        <languageList><iso639Id>uzb</iso639Id></languageList>
+      </configItem>
+    </layout>
+  </layoutList>
+</xkbConfigRegistry>

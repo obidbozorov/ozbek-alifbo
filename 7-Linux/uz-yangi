@@ -1,0 +1,18 @@
+// «Özbekça (yangi alifbo)» — XKB klaviatura joylashuvi
+// Asos: AQSh (QWERTY). AltGr (o'ng Alt) + O/G/S/C -> ö ğ ş ç (Shift bilan katta),
+// AltGr + ' -> ʼ (tutuq), Shift + AltGr + ' -> ʻ
+// Muallif: Bozorov Obidjon Norqobilovich, O'zbekiston Milliy universiteti (MIT)
+
+default partial alphanumeric_keys
+xkb_symbols "basic" {
+    include "us(basic)"
+    name[Group1] = "Özbekça (yangi alifbo)";
+
+    key <AD09> { type[Group1] = "FOUR_LEVEL_ALPHABETIC", [ o, O, odiaeresis, Odiaeresis ] };
+    key <AC05> { type[Group1] = "FOUR_LEVEL_ALPHABETIC", [ g, G, gbreve,     Gbreve     ] };
+    key <AC02> { type[Group1] = "FOUR_LEVEL_ALPHABETIC", [ s, S, scedilla,   Scedilla   ] };
+    key <AB03> { type[Group1] = "FOUR_LEVEL_ALPHABETIC", [ c, C, ccedilla,   Ccedilla   ] };
+    key <AC11> { [ apostrophe, quotedbl, U02BC, U02BB ] };
+
+    include "level3(ralt_switch)"
+};

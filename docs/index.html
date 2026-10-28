@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Özbekça — yangi alifbo konvertori</title>
+<meta name="description" content="Matnni yangi oʻzbek alifbosiga (ö ğ ş ç), amaldagi lotinga va kirillga oʻgiring. Word, Excel, PowerPoint plagini va Windows, Mac, Linux klaviaturalari — bepul.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231e6e5a'/%3E%3Ctext x='32' y='46' font-family='Georgia,serif' font-size='38' font-weight='700' text-anchor='middle' fill='white'%3EÖ%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #f6f8f7; --panel: #ffffff; --ink: #17211e; --muted: #5d6b66; --line: #dbe3e0;
+    --accent: #1e6e5a; --accent-ink: #ffffff; --accent-soft: #e3f1ec; --warn: #9a6a12;
+    --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #101614; --panel: #18201d; --ink: #e8efec; --muted: #9aaaa4; --line: #2b3633;
+      --accent: #3fae8c; --accent-ink: #08130f; --accent-soft: #1d3a31; --warn: #e0b04f;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #101614; --panel: #18201d; --ink: #e8efec; --muted: #9aaaa4; --line: #2b3633;
+    --accent: #3fae8c; --accent-ink: #08130f; --accent-soft: #1d3a31; --warn: #e0b04f;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 16px/1.55 "Segoe UI", system-ui, -apple-system, Roboto, sans-serif; }
+  a { color: var(--accent); }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 28px 0 8px; }
+  h1 { font: 700 clamp(28px, 5vw, 40px)/1.15 Georgia, "Times New Roman", serif; margin: 0 0 6px; letter-spacing: -.01em; }
+  .lead { color: var(--muted); margin: 0; max-width: 60ch; }
+  .letters { display: inline-flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+  .letters span { font: 600 15px var(--mono); background: var(--accent-soft); color: var(--accent);
+                  padding: 3px 9px; border-radius: 6px; }
+
+  .tool { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; margin: 20px 0;
+          box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+  .modes { display: flex; gap: 6px; padding: 12px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  .modes button { flex: 1 1 140px; border: 1px solid var(--line); background: transparent; color: var(--ink);
+                  padding: 10px 12px; border-radius: 10px; cursor: pointer; font-family: inherit; font-size: 15px; font-weight: 600; text-align: left; }
+  .modes button small { display: block; font-weight: 400; color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .modes button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .modes button[aria-pressed="true"] small { color: inherit; opacity: .85; }
+  .modes button:focus-visible, .actions button:focus-visible, .actions label:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .panes { display: grid; grid-template-columns: 1fr 1fr; }
+  .pane { display: flex; flex-direction: column; min-width: 0; }
+  .pane + .pane { border-left: 1px solid var(--line); }
+  .pane h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
+             margin: 0; padding: 10px 14px 0; font-weight: 600; }
+  textarea { width: 100%; min-height: 260px; resize: vertical; border: 0; background: transparent; color: var(--ink);
+             font-family: inherit; font-size: 17px; line-height: 1.6; padding: 8px 14px 14px; outline: none; }
+  #out { background: color-mix(in srgb, var(--accent-soft) 35%, transparent); }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding: 10px 12px;
+             border-top: 1px solid var(--line); }
+  .actions button, .actions label { border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+             padding: 8px 12px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 500; line-height: 1.3; }
+  .actions .primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .actions input[type=file] { display: none; }
+  .status { margin-left: auto; color: var(--muted); font-size: 14px; }
+
+  h2.sec { font: 700 24px/1.2 Georgia, "Times New Roman", serif; margin: 40px 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 16px; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; }
+  .card h3 { margin: 0 0 4px; font-size: 18px; }
+  .card p { margin: 0 0 12px; color: var(--muted); font-size: 15px; }
+  .card .btn { margin-top: auto; display: inline-block; text-align: center; background: var(--accent); color: var(--accent-ink);
+               text-decoration: none; padding: 10px 12px; border-radius: 9px; font-weight: 600; }
+  .card .btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); margin-top: 8px; }
+  table.keys { border-collapse: collapse; width: 100%; font-size: 15px; margin: 0 0 12px; }
+  table.keys td { padding: 3px 0; border-bottom: 1px dashed var(--line); }
+  table.keys td:last-child { text-align: right; font: 600 16px var(--mono); }
+  kbd { font: 13px var(--mono); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; background: var(--bg); }
+  .note { font-size: 14px; color: var(--muted); margin-top: 14px; }
+  footer { color: var(--muted); font-size: 14px; padding: 36px 0 40px; border-top: 1px solid var(--line); margin-top: 44px; }
+  .toggle { position: absolute; top: 16px; right: 16px; border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+            border-radius: 8px; padding: 6px 10px; cursor: pointer; font-family: inherit; font-size: 18px; line-height: 1; }
+
+  @media (max-width: 760px) {
+    .panes { grid-template-columns: 1fr; }
+    .pane + .pane { border-left: 0; border-top: 1px solid var(--line); }
+    textarea { min-height: 180px; }
+    .cards { grid-template-columns: 1fr; }
+    .status { margin-left: 0; width: 100%; }
+  }
+</style>
+</head>
+<body>
+<button class="toggle" id="theme" type="button" aria-label="Rang rejimini almashtirish">◐</button>
+<div class="wrap">
+  <header>
+    <h1>Özbekça</h1>
+    <p class="lead">Matnni yangi oʻzbek alifbosiga, amaldagi lotinga yoki kirillga bir zumda oʻgiring.
+      Hammasi brauzeringizda bajariladi — matn hech qayerga yuborilmaydi.</p>
+    <div class="letters" aria-label="Yangi harflar"><span>Oʻ → Ö</span><span>Gʻ → Ğ</span><span>Sh → Ş</span><span>Ch → Ç</span></div>
+  </header>
+
+  <section class="tool" aria-label="Konvertor">
+    <div class="modes" role="group" aria-label="Yoʻnalish">
+      <button type="button" data-mode="new" aria-pressed="true">Yangi alifboga<small>kirill va eski lotindan</small></button>
+      <button type="button" data-mode="old" aria-pressed="false">Eskichaga<small>yangi alifbo va kirilldan</small></button>
+      <button type="button" data-mode="cyr" aria-pressed="false">Kirillga<small>har qanday lotindan</small></button>
+    </div>
+    <div class="panes">
+      <div class="pane">
+        <h2><label for="in">Matn</label></h2>
+        <textarea id="in" spellcheck="false" placeholder="Matnni shu yerga yozing yoki qoʻying…">Oʻqituvchi shaharga choʻl orqali keldi.
+Ўқитувчи шаҳарга чўл орқали келди.</textarea>
+      </div>
+      <div class="pane">
+        <h2><label for="out">Natija</label></h2>
+        <textarea id="out" spellcheck="false" readonly></textarea>
+      </div>
+    </div>
+    <div class="actions">
+      <button type="button" class="primary" id="copy">Nusxalash</button>
+      <button type="button" id="swap" title="Natijani matn oʻrniga qoʻyish">⇅ Natijani matnga</button>
+      <label>Fayl ochish (.txt)<input type="file" id="file" accept=".txt,text/plain"></label>
+      <button type="button" id="save">Yuklab olish (.txt)</button>
+      <button type="button" id="clear">Tozalash</button>
+      <span class="status" id="status" aria-live="polite"></span>
+    </div>
+  </section>
+  <p class="note">Ruscha abzaslar oʻzgarishsiz qoladi. <b>Chevrolet, Photoshop, English</b> kabi soʻzlar va havolalar oʻgirilmaydi.</p>
+
+  <h2 class="sec">Kompyuteringiz uchun</h2>
+  <p class="sub">Bepul, ochiq kodli (MIT). Yangi harflarni har qanday dasturda bitta tugma bilan yozing.</p>
+  <div class="cards">
+    <div class="card">
+      <h3>Windows</h3>
+      <p>Word, Excel va PowerPoint uchun «Özbekça» lentasi + klaviatura — bitta oʻrnatuvchida.</p>
+      <table class="keys">
+        <tr><td><kbd>AltGr</kbd> + <kbd>O</kbd> <kbd>G</kbd> <kbd>S</kbd> <kbd>C</kbd></td><td>ö ğ ş ç</td></tr>
+        <tr><td><kbd>Shift</kbd> + <kbd>AltGr</kbd> + …</td><td>Ö Ğ Ş Ç</td></tr>
+      </table>
+      <a class="btn" href="https://github.com/obidbozorov/ozbek-alifbo/raw/main/dist/%C3%96zbek%C3%A7a-1.2.exe">Yuklab olish (.exe)</a>
+    </div>
+    <div class="card">
+      <h3>macOS</h3>
+      <p>Klaviatura joylashuvi. Oʻrnatish: faylni <b>Klaviatura joylashuvlari</b> papkasiga qoʻyish.</p>
+      <table class="keys">
+        <tr><td><kbd>Option</kbd> + <kbd>O</kbd> <kbd>G</kbd> <kbd>S</kbd> <kbd>C</kbd></td><td>ö ğ ş ç</td></tr>
+        <tr><td><kbd>Shift</kbd> + <kbd>Option</kbd> + …</td><td>Ö Ğ Ş Ç</td></tr>
+      </table>
+      <a class="btn" href="https://github.com/obidbozorov/ozbek-alifbo/raw/main/dist/Ozbekca-macOS.zip">Yuklab olish (.zip)</a>
+      <a class="btn ghost" href="https://github.com/obidbozorov/ozbek-alifbo/tree/main/6-macOS#readme">Oʻrnatish yoʻriqnomasi</a>
+    </div>
+    <div class="card">
+      <h3>Linux</h3>
+      <p>XKB klaviaturasi (GNOME, KDE va boshqalar). Oʻrnatish — bitta buyruq.</p>
+      <table class="keys">
+        <tr><td><kbd>AltGr</kbd> + <kbd>O</kbd> <kbd>G</kbd> <kbd>S</kbd> <kbd>C</kbd></td><td>ö ğ ş ç</td></tr>
+        <tr><td><kbd>Shift</kbd> + <kbd>AltGr</kbd> + …</td><td>Ö Ğ Ş Ç</td></tr>
+      </table>
+      <a class="btn" href="https://github.com/obidbozorov/ozbek-alifbo/raw/main/dist/Ozbekca-Linux.zip">Yuklab olish (.zip)</a>
+      <a class="btn ghost" href="https://github.com/obidbozorov/ozbek-alifbo/tree/main/7-Linux#readme">Oʻrnatish yoʻriqnomasi</a>
+    </div>
+  </div>
+  <p class="note">Barcha klaviaturalarda <kbd>AltGr</kbd>/<kbd>Option</kbd> + <kbd>'</kbd> → ʼ (tutuq belgisi, maʼno).</p>
+
+  <footer>
+    <b>Özbekça</b> — muallif: Bozorov Obidjon Norqobilovich, Mirzo Ulugʻbek nomidagi Oʻzbekiston Milliy universiteti,
+    Axborot xavfsizligi kafedrasi · <a href="mailto:o.bozorov@nuu.uz">o.bozorov@nuu.uz</a> ·
+    <a href="https://github.com/obidbozorov/ozbek-alifbo">GitHub</a> · MIT litsenziyasi
+  </footer>
+</div>
+
+<script src="converter.js"></script>
+<script>
+(function () {
+  var C = window.OzbekAlifbo;
+  var inp = document.getElementById("in"), out = document.getElementById("out"), status = document.getElementById("status");
+  var mode = "new";
+  try { mode = localStorage.getItem("ozbekca-mode") || "new"; } catch (e) {}
+
+  // Har bir abzas alohida: ruscha abzaslar o'tkazib yuboriladi
+  function perLine(text, fn) { return text.split("\n").map(fn).join("\n"); }
+  var convert = {
+    "new": function (t) { return perLine(t, function (l) { return C.convertText(C.cyrToLatin(l).text).text; }); },
+    "old": function (t) { return perLine(t, function (l) { return C.newToOld(C.cyrToLatin(l).text).text; }); },
+    "cyr": function (t) { return perLine(t, function (l) { return C.latToCyr(l).text; }); }
+  };
+
+  function countChanges(a, b) {
+    var aw = a.split(/\s+/), bw = b.split(/\s+/), n = 0;
+    for (var i = 0; i < Math.min(aw.length, bw.length); i++) if (aw[i] !== bw[i]) n++;
+    return n;
+  }
+  function run() {
+    var t = inp.value;
+    out.value = convert[mode](t);
+    var n = countChanges(t, out.value);
+    status.textContent = t ? (n + " ta soʻz oʻgirildi") : "";
+  }
+  function setMode(m) {
+    mode = m;
+    try { localStorage.setItem("ozbekca-mode", m); } catch (e) {}
+    document.querySelectorAll(".modes button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.mode === m)); });
+    run();
+  }
+  document.querySelectorAll(".modes button").forEach(function (b) { b.addEventListener("click", function () { setMode(b.dataset.mode); }); });
+  inp.addEventListener("input", run);
+
+  document.getElementById("copy").addEventListener("click", function () {
+    var done = function () { status.textContent = "Nusxa olindi ✓"; };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(out.value).then(done, function () { out.select(); document.execCommand("copy"); done(); });
+    else { out.select(); document.execCommand("copy"); done(); }
+  });
+  document.getElementById("swap").addEventListener("click", function () { inp.value = out.value; run(); inp.focus(); });
+  document.getElementById("clear").addEventListener("click", function () { inp.value = ""; run(); inp.focus(); });
+  document.getElementById("file").addEventListener("change", function (e) {
+    var f = e.target.files[0]; if (!f) return;
+    var r = new FileReader();
+    r.onload = function () { inp.value = String(r.result); run(); status.textContent = f.name + " — ochildi"; };
+    r.readAsText(f, "utf-8");
+    e.target.value = "";
+  });
+  document.getElementById("save").addEventListener("click", function () {
+    var blob = new Blob([out.value], { type: "text/plain;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = { "new": "yangi-alifbo.txt", "old": "eski-lotin.txt", "cyr": "kirill.txt" }[mode];
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  });
+
+  // rang rejimi
+  var root = document.documentElement;
+  try { var th = localStorage.getItem("ozbekca-theme"); if (th) root.setAttribute("data-theme", th); } catch (e) {}
+  document.getElementById("theme").addEventListener("click", function () {
+    var dark = root.getAttribute("data-theme") ? root.getAttribute("data-theme") === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    var next = dark ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("ozbekca-theme", next); } catch (e) {}
+  });
+
+  setMode(mode);
+})();
+</script>
+</body>
+</html>

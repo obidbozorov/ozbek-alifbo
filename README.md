@@ -3,6 +3,7 @@
 <p align="center">
   <a href="https://github.com/obidbozorov/ozbek-alifbo/raw/main/dist/%C3%96zbek%C3%A7a-1.2.exe"><img src="https://img.shields.io/badge/Download-%C3%96zbek%C3%A7a%201.2%20(.exe)-1e6e5a?style=for-the-badge&logo=windows&logoColor=white" alt="Download Özbekça 1.2"></a>
   <br><sub>Word, Excel va PowerPoint plagini + klaviatura · Windows · bepul (MIT)</sub>
+  <br><br><a href="https://obidbozorov.github.io/ozbek-alifbo/"><b>🌐 Onlayn konvertor</b></a> · <a href="dist/Ozbekca-macOS.zip">macOS klaviaturasi</a> · <a href="dist/Ozbekca-Linux.zip">Linux klaviaturasi</a>
 </p>
 
 Bitta oʻrnatuvchi: Office plagini va **«Özbekça (yangi alifbo)» klaviaturasi** (AltGr + O / G / S / C → ö ğ ş ç — barcha
@@ -207,6 +208,21 @@ Oʻrnatuvchi ularni shablonga (`customUI/images`) joylaydi; VSTO da ular `icons/
 qoʻshing. EXE ni qayta yigʻish: `4-Ornatuvchi-EXE/src/build.sh` (Windowsda — `csc` bilan xuddi shu parametrlar).
 
 ---
+
+## Onlayn konvertor
+
+**[obidbozorov.github.io/ozbek-alifbo](https://obidbozorov.github.io/ozbek-alifbo/)** — matnni brauzerda yangi alifboga, eskichaga yoki
+kirillga oʻgirish (`docs/`; matn hech qayerga yuborilmaydi). Konvertor `2-Office-Add-in/converter.js` bilan bir xil:
+`python3 tools/build_site.py` uni `docs/` ga koʻchiradi.
+
+## macOS va Linux klaviaturalari
+
+| | Yangi harflar | Yuklab olish | Yoʻriqnoma |
+|---|---|---|---|
+| macOS | Option + O / G / S / C → ö ğ ş ç | [Ozbekca-macOS.zip](dist/Ozbekca-macOS.zip) | [6-macOS](6-macOS/README.md) |
+| Linux (XKB) | AltGr + O / G / S / C → ö ğ ş ç | [Ozbekca-Linux.zip](dist/Ozbekca-Linux.zip) | [7-Linux](7-Linux/README.md) |
+
+Fayllarni `tools/make_keylayout.py` (macOS) yasaydi; Linux joylashuvi `7-Linux/uz-yangi`.
 
 ## Klaviatura: «Özbekça (yangi alifbo)»
 
