@@ -3,7 +3,7 @@
 <p align="center">
   <a href="https://github.com/obidbozorov/ozbek-alifbo/raw/main/dist/%C3%96zbek%C3%A7a-1.2.exe"><img src="https://img.shields.io/badge/Download-%C3%96zbek%C3%A7a%201.2%20(.exe)-1e6e5a?style=for-the-badge&logo=windows&logoColor=white" alt="Download Özbekça 1.2"></a>
   <br><sub>Word, Excel va PowerPoint plagini + klaviatura · Windows · bepul (MIT)</sub>
-  <br><br><a href="https://obidbozorov.github.io/ozbek-alifbo/"><b>🌐 Onlayn konvertor</b></a> · <a href="dist/Ozbekca-macOS.zip">macOS klaviaturasi</a> · <a href="dist/Ozbekca-Linux.zip">Linux klaviaturasi</a>
+  <br><br><a href="https://obidbozorov.github.io/ozbek-alifbo/"><b>🌐 Onlayn konvertor</b></a> · <a href="dist/Ozbekca-macOS.zip">macOS klaviaturasi</a> · <a href="dist/Ozbekca-Linux.zip">Linux klaviaturasi</a> · <a href="https://github.com/obidbozorov/ozbek-alifbo/raw/main/dist/%C3%96zbek%C3%A7a-Yozuv-1.0.exe"><b>⌨️ Özbekça Yozuv</b> (istalgan dasturda yozişda ögiriş)</a>
 </p>
 
 Bitta oʻrnatuvchi: Office plagini va **«Özbekça (yangi alifbo)» klaviaturasi** (AltGr + O / G / S / C → ö ğ ş ç — barcha
@@ -208,6 +208,13 @@ Oʻrnatuvchi ularni shablonga (`customUI/images`) joylaydi; VSTO da ular `icons/
 qoʻshing. EXE ni qayta yigʻish: `4-Ornatuvchi-EXE/src/build.sh` (Windowsda — `csc` bilan xuddi shu parametrlar).
 
 ---
+
+## Özbekça Yozuv — istalgan dasturda yozişda ögiriş
+
+[`dist/Özbekça-Yozuv-1.0.exe`](https://github.com/obidbozorov/ozbek-alifbo/raw/main/dist/%C3%96zbek%C3%A7a-Yozuv-1.0.exe) — alohida kiçik dastur.
+Telegram, brauzer, Bloknot va boşqa istalgan dasturda `o'` → ö, `g'` → ğ, `sh` → ş, `ch` → ç yozish paytida özi ögiriladi.
+Soat yonida Ö ikonkasi bölib turadi, **Alt+Shift+Z** — yoqiş/öçiriş. Parol maydonlarida işlamaydi,
+bosilgan tugmalar hech qayerga yozilmaydi va yuborilmaydi. Batafsil: [`8-Yozuv/`](8-Yozuv/).
 
 ## Onlayn konvertor
 
